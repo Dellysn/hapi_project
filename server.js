@@ -1,7 +1,6 @@
 const Hapi = require("@hapi/hapi");
 const Port = process.env.PORT || 3000;
 const Inert = require("@hapi/inert");
-const Vision = require("@hapi/vision");
 const Path = require("path");
 // create a server config
 const server = Hapi.server({
@@ -16,18 +15,6 @@ const server = Hapi.server({
 
 const config = async () => {
   await server.register(Inert);
-  await server.register(Vision);
-
-  server.views({
-    engines: {
-      html: require("handlebars"),
-    },
-    relativeTo: __dirname,
-    path: "./views",
-    partialsPath: "./views/partials",
-    layout: true,
-    layoutPath: "./views/layouts",
-  });
   // static file route
   server.route({
     method: "GET",
@@ -43,7 +30,7 @@ const config = async () => {
       method: "GET",
       path: "/",
       handler: (request, h) => {
-        return h.view("index.html");
+        return h.file("index.html");
       },
     },
 
