@@ -18,6 +18,7 @@ const config = async () => {
   await server.register(Inert);
   await server.register(Vision);
 
+  //setting up views
   server.views({
     engines: {
       html: require("handlebars"),
@@ -38,12 +39,35 @@ const config = async () => {
       },
     },
   });
+
   server.route([
     {
       method: "GET",
       path: "/",
       handler: (request, h) => {
-        return h.view("index.html");
+        // Create an array of objects
+        const lists = [
+          {
+            name: "Isiaka",
+            age: 20,
+          },
+          {
+            name: "Lukman",
+            age: 22,
+          },
+          {
+            name: "Bamidele",
+            age: 25,
+          },
+          {
+            name: "Dellyson",
+            age: 28,
+          },
+        ];
+        return h.view("index", {
+          title: "Home Page",
+          lists,
+        });
       },
     },
 
