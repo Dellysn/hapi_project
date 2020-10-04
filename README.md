@@ -21,7 +21,7 @@ Basic knowledge of how to use the terminal.
 
 Firstly, we'll create a folder to hold our project files together after which we will then initialize NPM to create a `package.json` file and then we can start installing our dependencies, I will be using `yarn` as my package manager, if you don't know what Yarn is, it's an alternative to `npm` package manager, instead of installing packages with `npm install`, it will be `yarn add` instead. You can read more about Yarn [here](https://yarnpkg.com/getting-started), it is pretty easy to use.
 
-Head up to your terminal, in your navigate to your project folder,
+Head up to your terminal, in your navigate to your projects folder,
 `mkdir hapi_project` to create a hapi_project folder, `cd hapi_project` to navigate to the new folder then `yarn init -y` to initializes a new package manager and create a `package.json` file in the project folder.
 
 Next up, we are going to install the necessary dependencies we are going to need for this lesson.
@@ -89,7 +89,20 @@ server.route({
 
 ```
 
-The `server` function has a `route` properties which take in an object or array of an object or we can get more sophisticated and create another file which exports an array of object and then uses it as a route, these objects have three important properties which includes; `method` which denote the type of request we are making to the route, it can either be a `GET`, `POST`,`PUT`, and a `DELETE` request, the `path` property is where to signify the endpoints and a `handler` method. The `handler` is where we handle the main business logic that is, the incoming request and the response we are sending back to the user. The `handler` method must return a value, promise, or an error using the `return` keyword. In the example above we only return and "Hello World" text,
+The `server` function has a `route` properties which take in an object or array of an object or we can get more sophisticated and create another file which exports an array of object and then uses it as a route, these objects have three important properties which includes; `method` which denote the type of request we are making to the route, it can either be a `GET`, `POST`,`PUT`, and a `DELETE` request, the `path` property is where to signify the endpoints and a `handler` method. The `handler` is where we handle the main business logic that is, the incoming request and the response we are sending back to the user. The `handler` method takes in two arguments the `request` and `h` keyword respectively you can name them anything you want but I like to leave them like that to avoid getting myself confused, the `request` object contains some handful of properties, for instance, when you submit a form data to the server you access it with `request.payload`, the data are available in the payload property of the `request object` and let's say you have parameters or queries available in your URL you can do
+
+```
+// for parameters in the URL
+
+request.params
+
+// for queries in the URL
+
+request.query
+
+```
+
+There are also lots more you can do with the request objects. The `h` object also contains some handful of response toolkit, for instance, you can return a view with the `h.view()` or a static file with the `h.file()` method, most importantly an `handler` method must return a value, promise, or an error using the `return` keyword. In the example above we only return and "Hello World" text,
 
 ![hello.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1601600382072/goJ8l4_kF.png)
 
@@ -255,60 +268,44 @@ server.route({
 
 ![static.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1601600690265/1vU1OoKUr.png)
 
-### Wrap up
+### Putting it all together
 
-There are many more things you can do with Hapi.js you are not just limited to the ones I have shown you, you are head over to the Hapi website and check out their documentation, it's nice and pretty straightforward. See you in my next Hapi post. Peace ✌
-
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+```
 const Hapi = require("@hapi/hapi");
 const Port = process.env.PORT || 3000;
 const Inert = require("@hapi/inert");
-const Vision = require("@hapi/vision");
 const Path = require("path");
 // create a server config
 const server = Hapi.server({
-host: "localhost",
-port: Port,
-routes: {
-files: {
-relativeTo: Path.join(\_\_dirname, "public"),
-},
-},
+  host: "localhost",
+  port: Port,
+  routes: {
+    files: {
+      relativeTo: Path.join(__dirname, "public"),
+    },
+  },
 });
 
 const config = async () => {
-await server.register(Inert);
-await server.register(Vision);
-
-server.views({
-engines: {
-html: require("handlebars"),
-},
-relativeTo: \_\_dirname,
-path: "./views",
-partialsPath: "./views/partials",
-layout: true,
-layoutPath: "./views/layouts",
-});
-// static file route
-server.route({
-method: "GET",
-path: "/{params\*}",
-handler: {
-directory: {
-path: ".",
-},
-},
-});
-server.route([
-{
-method: "GET",
-path: "/",
-handler: (request, h) => {
-return h.view("index.html");
-},
-},
+  await server.register(Inert);
+   // static file route
+  server.route({
+    method: "GET",
+    path: "/{params*}",
+    handler: {
+      directory: {
+        path: ".",
+      },
+    },
+  });
+  server.route([
+    {
+      method: "GET",
+      path: "/",
+      handler: (request, h) => {
+        return h.file("index.html");
+      },
+    },
 
     {
       method: "GET",
@@ -322,15 +319,22 @@ return h.view("index.html");
         };
       },
     },
+  ]);
 
-]);
-
-await server.start();
-console.log("Server listening on port ", server.info.uri);
+  await server.start();
+  console.log("Server listening on port ", server.info.uri);
 };
 config();
 // handling unhandledRejection Error
 process.on("unhandledRejection", (err) => {
-console.log(err);
-process.exit(1);
+  console.log(err);
+  process.exit(1);
 });
+
+```
+
+### Wrap up
+
+There are many more things you can do with Hapi.js you are not just limited to the ones I have shown you, you can head over to [Hapi website](https://hapi.dev/api).
+Find the link to the project repo below. See you in my next post. Peace ✌.
+[Repo link](https://github.com/Dellysn/hapi_project.git)
